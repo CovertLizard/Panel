@@ -32,18 +32,20 @@ public class CraftComponent
      * @param type the click type
      * @param action the action to call
      */
-    public void introduce(ClickType type, Action action)
+    public CraftComponent introduce(ClickType type, Action action)
     {
         if(this.actions.containsKey(type)) this.actions.put(type, action);
+        return this;
     }
 
     /**
      * Removes a type from the actions to call
      * @param type the type
      */
-    public void remove(ClickType type)
+    public CraftComponent remove(ClickType type)
     {
         this.actions.remove(type);
+        return this;
     }
 
     /**

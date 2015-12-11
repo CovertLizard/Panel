@@ -56,10 +56,11 @@ public class CraftPanel
      * @param id the layout's id
      * @param layout the layout instance
      */
-    public void introduce(int id, CraftLayout layout)
+    public CraftPanel introduce(int id, CraftLayout layout)
     {
         Validate.notNull(layout, "The layout CANNOT be NULL.");
         this.layouts.put("" + id, layout);
+        return this;
     }
 
     /**
@@ -67,67 +68,71 @@ public class CraftPanel
      * @param id the layout's id
      * @param layout the layout instance
      */
-    public void introduce(String id, CraftLayout layout)
+    public CraftPanel introduce(String id, CraftLayout layout)
     {
         Validate.notNull(layout, "The layout CANNOT be NULL.");
         this.layouts.put(id, layout);
+        return this;
     }
 
     /**
      * Introduces a new layout to the panel
      * @param layout the layout instance
      */
-    public void introduce(CraftLayout layout)
+    public CraftPanel introduce(CraftLayout layout)
     {
-        this.introduce(this.layouts.size(), layout);
+        return this.introduce(this.layouts.size(), layout);
     }
 
     /**
      * Removes a layout
      * @param id the id of the layout to remove
      */
-    public void remove(int id)
+    public CraftPanel remove(int id)
     {
         if(this.layouts.containsKey("" + id)) this.layouts.remove("" + id);
+        return this;
     }
 
     /**
      * Removes a layout
      * @param id the id of the layout to remove
      */
-    public void remove(String id)
+    public CraftPanel remove(String id)
     {
         if(this.layouts.containsKey(id)) this.layouts.remove(id);
+        return this;
     }
 
     /**
      * Shifts the currently selected layout
      * @param id the id of the layout to switch to
      */
-    public void shift(int id)
+    public CraftPanel shift(int id)
     {
-        if(!this.layouts.containsKey("" + id)) return;
+        if(!this.layouts.containsKey("" + id)) return this;
         this.index = "" + id;
-        this.shift();
+        return this.shift();
     }
 
     /**
      * Shifts the currently selected layout
      * @param id the id of the layout to switch to
      */
-    public void shift(String id)
+    public CraftPanel shift(String id)
     {
-        if(!this.layouts.containsKey(id)) return;
+        if(!this.layouts.containsKey(id)) return this;
         this.index = id;
-        this.shift();
+        return this.shift();
     }
 
     /**
      * Updates all players observing the inventory with the newly shifted inventory
      */
-    public void shift()
+    public CraftPanel shift()
     {
         this.layouts.get(this.index).getInventory().getViewers().forEach(player -> this.display(Player.class.cast(player)));
+        return this;
     }
 
     /**

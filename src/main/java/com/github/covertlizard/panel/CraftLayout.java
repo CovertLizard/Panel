@@ -62,10 +62,11 @@ public class CraftLayout
      * @param stack the Itemstack
      * @param position the position in the inventory to add the item
      */
-    public void introduce(ItemStack stack, int position)
+    public CraftLayout introduce(ItemStack stack, int position)
     {
         Validate.isTrue(position < this.inventory.getSize(), "The position CANNOT be GREATER than the size of the inventory.");
         this.inventory.setItem(position, stack);
+        return this;
     }
 
     /**
@@ -74,22 +75,23 @@ public class CraftLayout
      * @param stack the Itemstack
      * @param position the position in the inventory to add the item
      */
-    public void introduce(CraftComponent component, ItemStack stack, int position)
+    public CraftLayout introduce(CraftComponent component, ItemStack stack, int position)
     {
         Validate.isTrue(position < this.inventory.getSize(), "The position CANNOT be GREATER than the size of the inventory.");
-        this.introduce(stack, position);
         this.components.put(position, component);
+        return this.introduce(stack, position);
     }
 
     /**
      * Removes whatever item is in the occupied position
      * @param position the occupied position
      */
-    public void remove(int position)
+    public CraftLayout remove(int position)
     {
         Validate.isTrue(position < this.inventory.getSize(), "The position CANNOT be GREATER than the size of the inventory.");
         this.introduce(new ItemStack(Material.AIR), position);
         if(this.components.containsKey(position)) this.components.remove(position);
+        return this;
     }
 
     /**
@@ -106,9 +108,10 @@ public class CraftLayout
      * Fills the inventory with the specified stack
      * @param stack the stack to fill with
      */
-    public void fill(ItemStack stack)
+    public CraftLayout fill(ItemStack stack)
     {
         for(int index = 0; index < this.inventory.getSize(); index++) if(this.empty(index)) this.introduce(stack, index);
+        return this;
     }
 
     /**
@@ -125,9 +128,10 @@ public class CraftLayout
      * Sets whether or not the inventory can be 'messed up'
      * @param cancel whether or not to prevent item movement
      */
-    public void setCancel(boolean cancel)
+    public CraftLayout setCancel(boolean cancel)
     {
         this.cancel = cancel;
+        return this;
     }
 
     /**
