@@ -9,7 +9,7 @@ A powerful inventory management system designed for making UIs in Minecraft.
   <url>https://oss.sonatype.org/content/repositories/snapshots</url>
 </repository>
 
-<!--Cereal Library Dependency-->
+<!--Panel Library Dependency-->
 
  <dependency>
     <groupId>com.github.covertlizard</groupId>
