@@ -222,4 +222,9 @@ public class CraftPanel
     {
         return index;
     }
+
+    public String getId()
+    {
+        return this.id;
+    }
 }

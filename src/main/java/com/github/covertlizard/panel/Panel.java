@@ -92,4 +92,24 @@ public class Panel implements Listener
     {
         for(CraftPanel panel : Panel.panels) if(panel.contains(inventory)) return panel; return null;
     }
+
+    /**
+     * Gets the specified panel with the provided id
+     * @param id the id
+     * @return the panel instance
+     */
+    public static CraftPanel getPanel(int id)
+    {
+        return Panel.getPanel("" + id);
+    }
+
+    /**
+     * Gets the specified panel with the provided id
+     * @param id the id
+     * @return the panel instance
+     */
+    public static CraftPanel getPanel(String id)
+    {
+        for(CraftPanel panel : Panel.panels) if(panel.getId().equalsIgnoreCase(id)) return panel; return null;
+    }
 }
