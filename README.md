@@ -13,8 +13,8 @@ A powerful inventory management system designed for making UIs in Minecraft.
 
  <dependency>
     <groupId>com.github.covertlizard</groupId>
-    <artifactId>cereal</artifactId>
-    <version>1.0r-SNAPSHOT</version>
+    <artifactId>panel</artifactId>
+    <version>1.1-SNAPSHOT</version>
     <scope>compile</scope>
   </dependency>
 ```
