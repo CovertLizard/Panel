@@ -72,7 +72,7 @@ public class CraftComponent
         return actions;
     }
 
-    protected interface Action
+    public interface Action
     {
         public void action(Player player);
     }
