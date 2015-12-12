@@ -27,16 +27,34 @@ public class Panel implements Listener
     private static WeakReference<JavaPlugin> plugin;
 
     /**
-     * Registers the panels and listener
+     * Registers the listener
+     * @param plugin the plugin registering
+     */
+    public static void register(JavaPlugin plugin)
+    {
+        Validate.isTrue(Panel.plugin == null, "Already registered!");
+        Panel.plugin = new WeakReference<>(plugin);
+        Panel.plugin.get().getServer().getPluginManager().registerEvents(new Panel(), Panel.plugin.get());
+    }
+
+    /**
+     * Registers the specified panels
+     * @param panels the panels to register
+     */
+    public static void register(CraftPanel... panels)
+    {
+        Panel.panels.addAll(Arrays.asList(panels));
+    }
+
+    /**
+     * Registers the specified panels and the listener
      * @param plugin the plugin registering
      * @param panels the panels to register
      */
-    public static void register(JavaPlugin plugin, CraftPanel... panels)
+    public static void register(JavaPlugin plugin, CraftPanel panels)
     {
-        Validate.isTrue(Panel.plugin == null, "Already registered!");
-        Panel.panels.addAll(Arrays.asList(panels));
-        Panel.plugin = new WeakReference<>(plugin);
-        plugin.getServer().getPluginManager().registerEvents(new Panel(), plugin);
+        Panel.register(plugin);
+        Panel.register(panels);
     }
 
     @EventHandler
