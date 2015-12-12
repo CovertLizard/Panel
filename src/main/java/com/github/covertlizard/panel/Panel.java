@@ -28,7 +28,7 @@ public class Panel implements Listener
 
     /**
      * Registers the listener
-     * @param plugin the plugin registering
+     * @param plugin a plugin instance
      */
     public static void register(JavaPlugin plugin)
     {
