@@ -5,8 +5,6 @@ import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Map;
 
 /**
@@ -21,7 +19,7 @@ public class Layout
 {
     private final int size;
     private final HashMap<Integer, ItemStack> stacks = new HashMap<>();
-    private final HashSet<Component> components = new HashSet<>();
+    private final HashMap<Integer, Component> components = new HashMap<>();
 
     /**
      * Creates a new layout instance
@@ -54,7 +52,7 @@ public class Layout
      */
     public Layout introduce(int position, ItemStack stack, Component component)
     {
-        this.components.add(component);
+        this.components.put(position, component);
         return this.introduce(position, stack);
     }
 
@@ -67,10 +65,10 @@ public class Layout
     public Layout remove(int position, boolean component)
     {
         Validate.isTrue(this.stacks.containsKey(position), "The position specified could NOT be found in the layout.");
-        Validate.isTrue(!component ? true : this.contains(position), "The position specified has no attached actions.");
+        Validate.isTrue(!component ? true : this.components.containsKey(position), "The position specified has no attached actions.");
         this.stacks.remove(position);
         if(!component) return this;
-        Iterator<Component> iterator = this.components.iterator(); while(iterator.hasNext()) if(iterator.next().getPosition() == position) iterator.remove();
+        this.components.remove(position);
         return this;
     }
 
@@ -86,7 +84,7 @@ public class Layout
 
     public Layout fill(ItemStack stack, Component component)
     {
-        for(int index = 0; index < this.size; index++) if(!this.stacks.containsKey(index) && !this.contains(index)) this.introduce(index, stack, component); return this;
+        for(int index = 0; index < this.size; index++) if(!this.stacks.containsKey(index) && !this.components.containsKey(index)) this.introduce(index, stack, component); return this;
     }
 
     /**
@@ -100,16 +98,6 @@ public class Layout
     }
 
     /**
-     * Determines if the position has an action attached to it
-     * @param position the position in the inventory
-     * @return true if it has an action attached to it
-     */
-    public boolean contains(int position)
-    {
-        for(Component component : this.components) if(component.getPosition() == position) return true; return false;
-    }
-
-    /**
      * Finds the position of the ItemStack in the layout/inventory
      * @param stack the item stack instance
      * @return the position of the ItemStack in the layout/inventory
@@ -117,16 +105,6 @@ public class Layout
     public int position(ItemStack stack)
     {
         for(Map.Entry<Integer, ItemStack> entry : this.stacks.entrySet()) if(entry.getValue().equals(stack)) return entry.getKey(); return 0;
-    }
-
-    /**
-     * Gets the component at the specified position in the layout/inventory
-     * @param position the position of the component in the layout/inventory
-     * @return the component instance
-     */
-    public Component component(int position)
-    {
-        for(Component component : this.components) if(component.getPosition() == position) return component; return null;
     }
 
     public int getSize()
@@ -139,7 +117,7 @@ public class Layout
         return this.stacks;
     }
 
-    public HashSet<Component> getComponents()
+    public HashMap<Integer, Component> getComponents()
     {
         return this.components;
     }

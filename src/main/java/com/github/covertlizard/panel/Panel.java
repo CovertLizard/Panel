@@ -47,7 +47,7 @@ public class Panel
         this.size = this.type.getDefaultSize();
         this.inventory = Bukkit.getServer().createInventory(holder, type, title);
         this.layouts.put(0, new Layout(this.size));
-        if(!state.equals(State.DYNAMIC)) Panels.LAYOUTS.put(this.inventory, this);
+        if(!state.equals(State.DYNAMIC)) Panels.PANELS.put(this.inventory, this);
     }
 
     /**
@@ -67,7 +67,7 @@ public class Panel
         this.size = rows * 9;
         this.inventory = Bukkit.getServer().createInventory(holder, rows * 9, title);
         this.layouts.put(0, new Layout(this.size));
-        if(!state.equals(State.DYNAMIC)) Panels.LAYOUTS.put(this.inventory, this);
+        if(!state.equals(State.DYNAMIC)) Panels.PANELS.put(this.inventory, this);
     }
 
     /**
@@ -138,7 +138,7 @@ public class Panel
 
     /**
      * Changes the index to the layout id specified
-     * @param index the layout id
+     * @param id the layout id
      * @return the panel instance
      */
     public Panel swap(int id)

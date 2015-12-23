@@ -21,7 +21,7 @@ import java.util.HashMap;
 @SuppressWarnings("all")
 public class Panels implements Listener
 {
-    public static final HashMap<Inventory, Panel> LAYOUTS = new HashMap<>();
+    public static final HashMap<Inventory, Panel> PANELS = new HashMap<>();
     public static WeakReference<JavaPlugin> plugin;
 
     /**
@@ -38,24 +38,24 @@ public class Panels implements Listener
     @EventHandler
     private void onInventoryClickEvent(InventoryClickEvent event)
     {
-        if(!Panels.LAYOUTS.containsKey(event.getClickedInventory())) return;
-        switch(Panels.LAYOUTS.get(event.getClickedInventory()).getState())
+        if(!Panels.PANELS.containsKey(event.getClickedInventory())) return;
+        switch(Panels.PANELS.get(event.getClickedInventory()).getState())
         {
             case DYNAMIC:
                 break;
             case STATIC:
-                if(Panels.LAYOUTS.get(event.getClickedInventory()).getCurrentLayout().contains(event.getSlot())) Panels.LAYOUTS.get(event.getClickedInventory()).getCurrentLayout().component(event.getSlot()).eventAction(event);
+                if(Panels.PANELS.get(event.getClickedInventory()).getCurrentLayout().getComponents().containsKey(event.getSlot())) Panels.PANELS.get(event.getClickedInventory()).getCurrentLayout().getComponents().get(event.getSlot()).eventAction(event);
                 event.setCancelled(true);
                 break;
             default:
-                if(Panels.LAYOUTS.get(event.getClickedInventory()).getCurrentLayout().contains(event.getSlot())) Panels.LAYOUTS.get(event.getClickedInventory()).getCurrentLayout().component(event.getSlot()).eventAction(event);
+                if(Panels.PANELS.get(event.getClickedInventory()).getCurrentLayout().getComponents().containsKey(event.getSlot())) Panels.PANELS.get(event.getClickedInventory()).getCurrentLayout().getComponents().get(event.getSlot()).eventAction(event);
         }
     }
 
     @EventHandler
     private void onInventoryDragEvent(InventoryDragEvent event)
     {
-        if(!Panels.LAYOUTS.containsKey(event.getInventory())) return;
-        if(!Panels.LAYOUTS.get(event.getInventory()).getState().equals(Panel.State.DYNAMIC)) event.setCancelled(true);
+        if(!Panels.PANELS.containsKey(event.getInventory())) return;
+        if(!Panels.PANELS.get(event.getInventory()).getState().equals(Panel.State.DYNAMIC)) event.setCancelled(true);
     }
 }

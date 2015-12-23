@@ -16,7 +16,6 @@ import java.util.HashMap;
 @SuppressWarnings("all")
 public class Component
 {
-    private int position = 0;
     private final HashMap<ClickType, Action> actions = new HashMap<>();
 
     /**
@@ -27,17 +26,6 @@ public class Component
     {
         Validate.notNull(action, "The action CANNOT be NULL.");
         this.actions.put(null, action);
-    }
-
-    /**
-     * Sets the position value used for reference in an inventory
-     * @param position the position of the component
-     * @return the component instance
-     */
-    public Component setPosition(int position)
-    {
-        this.position = position;
-        return this;
     }
 
     /**
@@ -77,11 +65,6 @@ public class Component
             return;
         }
         if(this.actions.containsKey(event.getClick())) this.actions.get(event.getClick()).run(event);
-    }
-
-    public int getPosition()
-    {
-        return this.position;
     }
 
     public HashMap<ClickType, Action> getActions()
