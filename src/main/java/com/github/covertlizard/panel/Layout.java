@@ -1,188 +1,106 @@
 package com.github.covertlizard.panel;
 
 import org.apache.commons.lang.Validate;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.entity.Player;
-import org.bukkit.event.inventory.InventoryType;
-import org.bukkit.inventory.*;
+import org.bukkit.inventory.ItemStack;
 
-import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Map;
 
 /**
  * Project: Panel
- * Created: 12/19/2015
- * Time: 21:42
- * Package: com.github.covertlizard.panel.temp
- * Description: Contains a layout of components in an inventory and provides utilities for managing them
+ * Created: 12/23/2015
+ * Time: 15:16
+ * Package: com.github.covertlizard.panel
+ * Description: Creates a layout with an equivalent size of a panel that contains several items
  */
 @SuppressWarnings("all")
 public class Layout
 {
-    private final State state;
-    private final InventoryHolder holder;
-    private final InventoryType type;
-    private final String title;
     private final int size;
-    private final Inventory inventory;
+    private final HashMap<Integer, ItemStack> stacks = new HashMap<>();
     private final HashSet<Component> components = new HashSet<>();
 
     /**
      * Creates a new layout instance
-     * @param state the state of the layout
-     * @param holder the holder of the inventory
-     * @param type the type of inventory
-     * @param title the inventory's title
+     * @param size the size of the inventory
      */
-    public Layout(State state, InventoryHolder holder, InventoryType type, String title)
+    public Layout(int size)
     {
-        this.state = state;
-        this.holder = holder;
-        this.type = type;
-        this.title = title;
-        this.size = this.type.getDefaultSize();
-        this.inventory = Bukkit.getServer().createInventory(holder, type, title);
-        if(!state.equals(State.DYNAMIC)) Panels.LAYOUTS.put(this.inventory, this);
+        this.size = size;
     }
 
     /**
-     * Creates a new layout instance
-     * @param state the state of the layout
-     * @param holder the holder of the layout
-     * @param title the inventory's title
-     * @param rows the amount of rows in the inventory
-     */
-    public Layout(State state, InventoryHolder holder, String title, int rows)
-    {
-        this.state = state;
-        this.holder = holder;
-        this.type = InventoryType.CHEST;
-        this.title = title;
-        this.size = rows * 9;
-        this.inventory = Bukkit.getServer().createInventory(holder, rows * 9, title);
-        if(!state.equals(State.DYNAMIC)) Panels.LAYOUTS.put(this.inventory, this);
-    }
-
-    /**
-     * Creates a new layout instance
-     * @param state the state of the layout
-     * @param type the type of inventory
-     * @param title the inventory's title
-     */
-    public Layout(State state, InventoryType type, String title)
-    {
-        this(state, null, type, title);
-    }
-
-    /**
-     * Creates a new layout instance
-     * @param state the state of the layout
-     * @param title the inventory's title
-     * @param rows the amount of rows in the inventory
-     */
-    public Layout(State state, String title, int rows)
-    {
-        this(state, null, title, rows);
-    }
-
-    /**
-     * Introduces a new item at the specified position into the inventory
-     * @param stack the item stack to add into the inventory
-     * @param position the position in the inventory to add the item to
+     * Introduces a new item into the layout
+     * @param position the position of the item in the layout
+     * @param stack the item stack to add
      * @return the layout instance
      */
-    public Layout introduce(ItemStack stack, int position)
+    public Layout introduce(int position, ItemStack stack)
     {
         Validate.isTrue(position <= (this.size - 1), "The position CANNOT be greater OR equal to the the size of the inventory.");
-        this.inventory.setItem(position, stack);
+        this.stacks.put(position, stack);
         return this;
     }
 
     /**
-     * Introduces a new item at the specified position into the inventory and saves the action to call when the stack is interacted with
-     * @param component the component instance
-     * @param stack the item stack to add into the inventory
-     * @param position the position in the inventory to add the item to
+     * Introduces a new item into the layout and adds an action listener to it
+     * @param position the position of the item in the layout
+     * @param stack the item stack to add
+     * @param component the action to be called when the item is clicked
      * @return the layout instance
      */
-    public Layout introduce(Component component, ItemStack stack, int position)
+    public Layout introduce(int position, ItemStack stack, Component component)
     {
-        this.components.add(component.setPosition(position));
-        return this.introduce(stack, position);
+        this.components.add(component);
+        return this.introduce(position, stack);
     }
 
     /**
-     * Removes the component at the specified position from the inventory
+     * Removes the item at the specified position from the layout
      * @param position the position in the inventory
+     * @param component whether or not to remove the action attached to the position
      * @return the layout instance
      */
-    public Layout remove(int position)
+    public Layout remove(int position, boolean component)
     {
-        Validate.isTrue(this.contains(position), "Inventory does NOT contain a component at the specified position.");
-        Iterator<Component> iterator = this.components.iterator();
-        while(iterator.hasNext()) if(iterator.next().getPosition() == position) iterator.remove();
+        Validate.isTrue(this.stacks.containsKey(position), "The position specified could NOT be found in the layout.");
+        Validate.isTrue(!component ? true : this.contains(position), "The position specified has no attached actions.");
+        this.stacks.remove(position);
+        if(!component) return this;
+        Iterator<Component> iterator = this.components.iterator(); while(iterator.hasNext()) if(iterator.next().getPosition() == position) iterator.remove();
         return this;
     }
 
     /**
-     * Deletes an item from the position in the inventory
-     * @param position the position in the inventory
-     * @return the layout instance
-     */
-    public Layout delete(int position)
-    {
-        Validate.isTrue(position <= (this.size - 1), "The position CANNOT be greater OR equal to the the size of the inventory.");
-        this.inventory.setItem(position, new ItemStack(Material.AIR));
-        return this;
-    }
-
-    /**
-     * Fills empty spaces in the inventory with the specified ItemStack
-     * @param stack the ItemStack to fill the inventory with
+     * Fills any empty spaces in the layout with the specified ItemStack
+     * @param stack the item stack to add
      * @return the layout instance
      */
     public Layout fill(ItemStack stack)
     {
-        for(int index = 0; index < this.inventory.getSize(); index++) if(this.empty(index)) this.introduce(stack, index);
-        return this;
+        for(int index = 0; index < this.size; index++) if(!this.stacks.containsKey(index)) this.introduce(index, stack); return this;
     }
 
-    /**
-     * Fills empty spaces in the inventory with the specified ItemStack and attaches the specified action to the item
-     * @param component the component to attach to each empty spot filled
-     * @param stack the ItemStack to fill the inventory with
-     * @return the layout instance
-     */
-    public Layout fill(Component component, ItemStack stack)
+    public Layout fill(ItemStack stack, Component component)
     {
-        for(int index = 0; index < this.inventory.getSize(); index++) if(this.empty(index)) this.introduce(component, stack, index);
-        return this;
+        for(int index = 0; index < this.size; index++) if(!this.stacks.containsKey(index) && !this.contains(index)) this.introduce(index, stack, component); return this;
     }
 
     /**
-     * Displays the Layout to the specified players
-     * @param players the players to display the layout to
-     * @return the layout instance
+     * Determines if there are any items at the specified position
+     * @param position the position in the inventory
+     * @return true if the position is empty
      */
-    public Layout display(Collection<? extends Player> players)
+    public boolean empty(int position)
     {
-        for(Player player : players) player.openInventory(this.inventory); return this;
+        return this.stacks.containsKey(position) ? this.stacks.get(position).getType().equals(Material.AIR) : true;
     }
 
     /**
-     * Displays the Layout to the specified players
-     * @param players the players to display the layout to
-     * @return the layout instance
-     */
-    public Layout display(Player... players)
-    {
-        for(Player player : players) player.openInventory(this.inventory); return this;
-    }
-
-    /**
-     * Determines if the position in the inventory has an action attached to it
+     * Determines if the position has an action attached to it
      * @param position the position in the inventory
      * @return true if it has an action attached to it
      */
@@ -192,28 +110,18 @@ public class Layout
     }
 
     /**
-     * Determines if the item at the specified slot is air
-     * @param position the position in the inventory
-     * @return true if the item is air
-     */
-    public boolean empty(int position)
-    {
-        return position >= this.size || this.inventory.getItem(position).getType().equals(Material.AIR);
-    }
-
-    /**
-     * Finds the position of the ItemStack in the inventory
+     * Finds the position of the ItemStack in the layout/inventory
      * @param stack the item stack instance
-     * @return the position of the ItemStack in the inventory
+     * @return the position of the ItemStack in the layout/inventory
      */
     public int position(ItemStack stack)
     {
-        for(int index = 0; index < this.inventory.getSize(); index++) if(this.inventory.getItem(index).equals(stack)) return index; return 0;
+        for(Map.Entry<Integer, ItemStack> entry : this.stacks.entrySet()) if(entry.getValue().equals(stack)) return entry.getKey(); return 0;
     }
 
     /**
-     * Gets the component at the specified position in the inventory
-     * @param position the position of the component in the inventory
+     * Gets the component at the specified position in the layout/inventory
+     * @param position the position of the component in the layout/inventory
      * @return the component instance
      */
     public Component component(int position)
@@ -221,46 +129,18 @@ public class Layout
         for(Component component : this.components) if(component.getPosition() == position) return component; return null;
     }
 
-    public State getState()
-    {
-        return this.state;
-    }
-
-    public InventoryHolder getHolder()
-    {
-        return this.holder;
-    }
-
-    public InventoryType getType()
-    {
-        return this.type;
-    }
-
-    public String getTitle()
-    {
-        return this.title;
-    }
-
     public int getSize()
     {
         return this.size;
     }
 
-    public Inventory getInventory()
+    public HashMap<Integer, ItemStack> getStacks()
     {
-        return this.inventory;
+        return this.stacks;
     }
 
     public HashSet<Component> getComponents()
     {
         return this.components;
-    }
-
-    /**
-     * Defines the mobility of the inventory. STATIC: Items CANNOT be moved whatsoever, DYNAMIC: Items CAN be moved at ANY time, BALANCE: Items CANNOT be moved by the player but can be moved through method calls
-     */
-    public enum State
-    {
-        STATIC, DYNAMIC, BALANCE;
     }
 }

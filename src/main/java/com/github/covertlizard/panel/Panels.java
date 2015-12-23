@@ -21,7 +21,7 @@ import java.util.HashMap;
 @SuppressWarnings("all")
 public class Panels implements Listener
 {
-    public static final HashMap<Inventory, Layout> LAYOUTS = new HashMap<>();
+    public static final HashMap<Inventory, Panel> LAYOUTS = new HashMap<>();
     public static WeakReference<JavaPlugin> plugin;
 
     /**
@@ -44,11 +44,11 @@ public class Panels implements Listener
             case DYNAMIC:
                 break;
             case STATIC:
-                if(Panels.LAYOUTS.get(event.getClickedInventory()).contains(event.getSlot())) Panels.LAYOUTS.get(event.getClickedInventory()).component(event.getSlot()).eventAction(event);
+                if(Panels.LAYOUTS.get(event.getClickedInventory()).getCurrentLayout().contains(event.getSlot())) Panels.LAYOUTS.get(event.getClickedInventory()).getCurrentLayout().component(event.getSlot()).eventAction(event);
                 event.setCancelled(true);
                 break;
             default:
-                if(Panels.LAYOUTS.get(event.getClickedInventory()).contains(event.getSlot())) Panels.LAYOUTS.get(event.getClickedInventory()).component(event.getSlot()).eventAction(event);
+                if(Panels.LAYOUTS.get(event.getClickedInventory()).getCurrentLayout().contains(event.getSlot())) Panels.LAYOUTS.get(event.getClickedInventory()).getCurrentLayout().component(event.getSlot()).eventAction(event);
         }
     }
 
@@ -56,6 +56,6 @@ public class Panels implements Listener
     private void onInventoryDragEvent(InventoryDragEvent event)
     {
         if(!Panels.LAYOUTS.containsKey(event.getInventory())) return;
-        if(!Panels.LAYOUTS.get(event.getInventory()).getState().equals(Layout.State.DYNAMIC)) event.setCancelled(true);
+        if(!Panels.LAYOUTS.get(event.getInventory()).getState().equals(Panel.State.DYNAMIC)) event.setCancelled(true);
     }
 }

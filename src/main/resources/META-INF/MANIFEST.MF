@@ -1,2 +1,5 @@
 Manifest-Version: 1.0
+Archiver-Version: Plexus Archiver
+Built-By: CovertLizard
 Created-By: 1.8.0_66 (CovertLizard)
+Build-Jdk: 1.8.0_66
