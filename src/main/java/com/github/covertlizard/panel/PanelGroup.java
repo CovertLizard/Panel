@@ -1,5 +1,7 @@
 package com.github.covertlizard.panel;
 
+import java.util.HashMap;
+
 /****************************************************
  * Created: 1/17/2016 at 1:58 PM by CovertLizard
  * FQN: com.github.covertlizard.panel.PanelGroup
@@ -24,8 +26,18 @@ public class PanelGroup
         return this;
     }
 
+    public final Panel modify(Object id)
+    {
+        return this.panels.get(id);
+    }
+
     public final Action swap(Object id)
     {
         return event -> event.getWhoClicked().openInventory(this.panels.get(id).getInventory());
+    }
+
+    public HashMap<Object, Panel> getPanels()
+    {
+        return this.panels;
     }
 }
