@@ -6,9 +6,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.inventory.Inventory;
-import org.bukkit.plugin.java.JavaPlugin;
-
-import java.lang.ref.WeakReference;
 import java.util.HashMap;
 
 /**
@@ -22,17 +19,17 @@ import java.util.HashMap;
 public class Panels implements Listener
 {
     public static final HashMap<Inventory, Panel> PANELS = new HashMap<>();
-    public static WeakReference<JavaPlugin> plugin;
+    private static boolean register;
 
     /**
      * Registers the Panel listener to the plugin instance
      * @param plugin the plugin instance
      */
-    public static void register(JavaPlugin plugin)
+    public static void register(org.bukkit.plugin.java.JavaPlugin plugin)
     {
-        Validate.isTrue(Panels.plugin == null, "You have already registered the Panel listener.");
-        Panels.plugin = new WeakReference<>(plugin);
+        Validate.isTrue(!Panels.register, "You have already registered the Panel listener.");
         plugin.getServer().getPluginManager().registerEvents(new Panels(), plugin);
+        Panels.register = true;
     }
 
     @EventHandler

@@ -17,17 +17,14 @@ import java.util.Map;
 @SuppressWarnings("all")
 public class Layout
 {
-    private final int size;
+    private int size;
     private final HashMap<Integer, ItemStack> stacks = new HashMap<>();
     private final HashMap<Integer, Component> components = new HashMap<>();
 
-    /**
-     * Creates a new layout instance
-     * @param size the size of the inventory
-     */
-    public Layout(int size)
+    public final Layout size(int size)
     {
         this.size = size;
+        return this;
     }
 
     /**

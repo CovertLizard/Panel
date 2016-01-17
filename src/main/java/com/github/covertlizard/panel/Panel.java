@@ -27,8 +27,8 @@ public class Panel
     private final String title;
     private final int size;
     private final Inventory inventory;
-    private final HashMap<Integer, Layout> layouts = new HashMap<>();
-    private int index = 0;
+    private final HashMap<Object, Layout> layouts = new HashMap<>();
+    private Object index = 0;
 
     /**
      * Creates a new panel instance
@@ -46,7 +46,7 @@ public class Panel
         this.title = title;
         this.size = this.type.getDefaultSize();
         this.inventory = Bukkit.getServer().createInventory(holder, type, title);
-        this.layouts.put(0, new Layout(this.size));
+        this.layouts.put(0, new Layout().size(this.size));
         if(!state.equals(State.DYNAMIC)) Panels.PANELS.put(this.inventory, this);
     }
 
@@ -66,7 +66,7 @@ public class Panel
         this.title = title;
         this.size = rows * 9;
         this.inventory = Bukkit.getServer().createInventory(holder, rows * 9, title);
-        this.layouts.put(0, new Layout(this.size));
+        this.layouts.put(0, new Layout().size(this.size));
         if(!state.equals(State.DYNAMIC)) Panels.PANELS.put(this.inventory, this);
     }
 
@@ -98,9 +98,9 @@ public class Panel
      * @param layout the layout instance
      * @return the panel instance
      */
-    public Panel introduce(int id, Layout layout)
+    public Panel introduce(Object id, Layout layout)
     {
-        this.layouts.put(id, layout);
+        this.layouts.put(id, layout.size(this.size));
         return this;
     }
 
@@ -119,7 +119,7 @@ public class Panel
      * @param id the id of the layout
      * @return the panel instance
      */
-    public Panel remove(int id)
+    public Panel remove(Object id)
     {
         Validate.isTrue(this.layouts.containsKey(id), "The layout specified could not be found.");
         this.layouts.remove(id);
@@ -141,7 +141,7 @@ public class Panel
      * @param id the layout id
      * @return the panel instance
      */
-    public Panel swap(int id)
+    public Panel swap(Object id)
     {
         this.index = this.layouts.containsKey(id) ? id : 0;
         return this;
@@ -209,12 +209,12 @@ public class Panel
         return this.inventory;
     }
 
-    public HashMap<Integer, Layout> getLayouts()
+    public HashMap<Object, Layout> getLayouts()
     {
         return this.layouts;
     }
 
-    public int getIndex()
+    public Object getIndex()
     {
         return this.index;
     }
