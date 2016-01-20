@@ -21,7 +21,7 @@ import java.util.Map;
 @SuppressWarnings("all")
 public class Panel
 {
-    private final State state;
+    private final boolean moveable;
     private final InventoryHolder holder;
     private final InventoryType type;
     private final String title;
@@ -32,64 +32,84 @@ public class Panel
 
     /**
      * Creates a new panel instance
-     * @param state the state of the panel
+     * @param moveable whether or not contents within the panel can be moved by the player
      * @param holder the holder of the inventory
      * @param type the type of inventory
      * @param title the inventory's title
      */
-    public Panel(State state, InventoryHolder holder, InventoryType type, String title)
+    public Panel(boolean moveable, InventoryHolder holder, InventoryType type, String title)
     {
         Validate.isTrue(title.length() <= 32, "The title of the inventory can NOT be longer than 32 characters!");
-        this.state = state;
+        this.moveable = moveable;
         this.holder = holder;
         this.type = type;
         this.title = title;
         this.size = this.type.getDefaultSize();
         this.inventory = Bukkit.getServer().createInventory(holder, type, title);
         this.layouts.put(0, new Layout().size(this.size));
-        if(!state.equals(State.DYNAMIC)) Panels.PANELS.put(this.inventory, this);
+        if(!moveable) Panels.PANELS.put(this.inventory, this);
     }
 
     /**
      * Creates a new panel instance
-     * @param state the state of the panel
+     * @param moveable whether or not contents within the panel can be moved by the player
      * @param holder the holder of the panel
      * @param title the inventory's title
      * @param rows the amount of rows in the inventory
      */
-    public Panel(State state, InventoryHolder holder, String title, int rows)
+    public Panel(boolean moveable, InventoryHolder holder, String title, int rows)
     {
         Validate.isTrue(title.length() <= 32, "The title of the inventory can NOT be longer than 32 characters!");
-        this.state = state;
+        this.moveable = moveable;
         this.holder = holder;
         this.type = InventoryType.CHEST;
         this.title = title;
         this.size = rows * 9;
         this.inventory = Bukkit.getServer().createInventory(holder, rows * 9, title);
         this.layouts.put(0, new Layout().size(this.size));
-        if(!state.equals(State.DYNAMIC)) Panels.PANELS.put(this.inventory, this);
+        if(!moveable) Panels.PANELS.put(this.inventory, this);
     }
 
     /**
      * Creates a new panel instance
-     * @param state the state of the panel
+     * @param moveable whether or not contents within the panel can be moved by the player
      * @param type the type of inventory
      * @param title the inventory's title
      */
-    public Panel(State state, InventoryType type, String title)
+    public Panel(boolean moveable, InventoryType type, String title)
     {
-        this(state, null, type, title);
+        this(moveable, null, type, title);
     }
 
     /**
      * Creates a new panel instance
-     * @param state the state of the panel
+     * @param moveable whether or not contents within the panel can be moved by the player
      * @param title the inventory's title
      * @param rows the amount of rows in the inventory
      */
-    public Panel(State state, String title, int rows)
+    public Panel(boolean moveable, String title, int rows)
     {
-        this(state, null, title, rows);
+        this(moveable, null, title, rows);
+    }
+
+    /**
+     * Creates a new panel instance
+     * @param type the type of inventory
+     * @param title the inventory's title
+     */
+    public Panel(InventoryType type, String title)
+    {
+        this(false, type, title);
+    }
+
+    /**
+     * Creates a new panel instance
+     * @param title the inventory's title
+     * @param rows the amount of rows in the inventory
+     */
+    public Panel(String title, int rows)
+    {
+        this(false, title, rows);
     }
 
     /**
@@ -179,9 +199,9 @@ public class Panel
         for(Player player : players) player.openInventory(this.inventory); return this;
     }
 
-    public State getState()
+    public boolean isMoveable()
     {
-        return this.state;
+        return this.moveable;
     }
 
     public InventoryHolder getHolder()
@@ -227,13 +247,5 @@ public class Panel
     public Layout getCurrentLayout()
     {
         return this.layouts.get(this.index);
-    }
-
-    /**
-     * Defines the mobility of the inventory. STATIC: Items CANNOT be moved whatsoever, DYNAMIC: Items CAN be moved at ANY time, BALANCE: Items CANNOT be moved by the player but can be moved through method calls
-     */
-    public enum State
-    {
-        STATIC, DYNAMIC, BALANCE;
     }
 }

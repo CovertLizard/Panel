@@ -1,5 +1,8 @@
 package com.github.covertlizard.panel;
 
+import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.inventory.Inventory;
+
 import java.util.HashMap;
 
 /****************************************************
@@ -12,6 +15,12 @@ public class PanelGroup
 {
     private final java.util.HashMap<Object, Panel> panels = new java.util.HashMap<>();
 
+    /**
+     * Introduces a new Panel to the group
+     * @param id the id to save the panel as
+     * @param panel the panel to add
+     * @return the PanelGroup instance
+     */
     public PanelGroup introduce(Object id, Panel panel)
     {
         if(this.panels.containsKey(id)) return this;
@@ -19,6 +28,11 @@ public class PanelGroup
         return this;
     }
 
+    /**
+     * Removes a Panel from the group
+     * @param id the panel's id
+     * @return the PanelGroup instance
+     */
     public PanelGroup remove(Object id)
     {
         if(!this.panels.containsKey(id)) return this;
@@ -26,14 +40,32 @@ public class PanelGroup
         return this;
     }
 
+    /**
+     * Returns a Panel's instance
+     * @param id the panel's id
+     * @return the Panel instance
+     */
     public final Panel modify(Object id)
     {
         return this.panels.get(id);
     }
 
-    public final Action swap(Object id)
+    /**
+     * Creates a component instance that has an action which 'swaps' the player to the panel specified
+     * @param id the panel's id
+     * @return the component instance
+     */
+    public final Component swap(Object id)
     {
-        return event -> event.getWhoClicked().openInventory(this.panels.get(id).getInventory());
+        final Inventory inventory = this.modify(id).getInventory();
+        return new Component(new Component.Action()
+        {
+            @Override
+            public void run(InventoryClickEvent event)
+            {
+                event.getWhoClicked().openInventory(inventory);
+            }
+        });
     }
 
     public HashMap<Object, Panel> getPanels()

@@ -71,4 +71,9 @@ public class Component
     {
         return this.actions;
     }
+
+    public static interface Action
+    {
+        public void run(InventoryClickEvent event);
+    }
 }

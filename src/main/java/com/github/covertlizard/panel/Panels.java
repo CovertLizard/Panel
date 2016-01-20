@@ -36,23 +36,15 @@ public class Panels implements Listener
     private void onInventoryClickEvent(InventoryClickEvent event)
     {
         if(!Panels.PANELS.containsKey(event.getClickedInventory())) return;
-        switch(Panels.PANELS.get(event.getClickedInventory()).getState())
-        {
-            case DYNAMIC:
-                break;
-            case STATIC:
-                if(Panels.PANELS.get(event.getClickedInventory()).getCurrentLayout().getComponents().containsKey(event.getSlot())) Panels.PANELS.get(event.getClickedInventory()).getCurrentLayout().getComponents().get(event.getSlot()).eventAction(event);
-                event.setCancelled(true);
-                break;
-            default:
-                if(Panels.PANELS.get(event.getClickedInventory()).getCurrentLayout().getComponents().containsKey(event.getSlot())) Panels.PANELS.get(event.getClickedInventory()).getCurrentLayout().getComponents().get(event.getSlot()).eventAction(event);
-        }
+        if(Panels.PANELS.get(event.getClickedInventory()).getCurrentLayout().getComponents().containsKey(event.getSlot())) Panels.PANELS.get(event.getClickedInventory()).getCurrentLayout().getComponents().get(event.getSlot()).eventAction(event);
+        if(Panels.PANELS.get(event.getClickedInventory()).isMoveable()) return;
+        event.setCancelled(true);
     }
 
     @EventHandler
     private void onInventoryDragEvent(InventoryDragEvent event)
     {
         if(!Panels.PANELS.containsKey(event.getInventory())) return;
-        if(!Panels.PANELS.get(event.getInventory()).getState().equals(Panel.State.DYNAMIC)) event.setCancelled(true);
+        if(!Panels.PANELS.get(event.getInventory()).isMoveable()) event.setCancelled(true);
     }
 }

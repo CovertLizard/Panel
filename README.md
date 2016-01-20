@@ -14,7 +14,7 @@ A powerful inventory management system designed for making UIs in Minecraft.
  <dependency>
     <groupId>com.github.covertlizard</groupId>
     <artifactId>panel</artifactId>
-    <version>1.1-SNAPSHOT</version>
+    <version>1.8-SNAPSHOT</version>
     <scope>compile</scope>
   </dependency>
 ```
