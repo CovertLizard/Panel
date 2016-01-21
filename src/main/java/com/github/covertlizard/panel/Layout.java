@@ -1,112 +1,100 @@
 package com.github.covertlizard.panel;
 
-import org.apache.commons.lang.Validate;
 import org.bukkit.Material;
+import org.bukkit.event.inventory.ClickType;
+import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * Project: Panel
- * Created: 12/23/2015
- * Time: 15:16
- * Package: com.github.covertlizard.panel
- * Description: Creates a layout with an equivalent size of a panel that contains several items
- */
+/****************************************************
+ * Created: 1/20/2016 at 6:24 PM by CovertLizard
+ * FQN: com.github.covertlizard.panel.Layout
+ * Info: Creates a layout with mapped items
+ ****************************************************/
 @SuppressWarnings("all")
 public class Layout
 {
-    private int size;
-    private final HashMap<Integer, ItemStack> stacks = new HashMap<>();
     private final HashMap<Integer, Component> components = new HashMap<>();
+    private final HashMap<Integer, ItemStack> stacks = new HashMap<>();
 
-    public final Layout size(int size)
+    /**
+     * Moves an element in the layout to a new position
+     * @param positionBefore the position it currently is at
+     * @param positionAfter the position to move it to
+     * @return the Layout instance
+     */
+    public Layout move(int positionBefore, int positionAfter)
     {
-        this.size = size;
+        if(!this.stacks.containsKey(positionBefore)) throw new IllegalArgumentException("Stack: " + positionBefore + " does not exist.");
+        if(this.components.containsKey(positionBefore)) this.components.put(positionAfter, this.components.get(positionBefore));
+        this.introduce(positionAfter, this.stack(positionBefore));
+        this.remove(positionBefore);
+        if(this.components.containsKey(positionBefore)) this.components.remove(positionBefore);
         return this;
     }
 
     /**
-     * Introduces a new item into the layout
-     * @param position the position of the item in the layout
-     * @param stack the item stack to add
-     * @return the layout instance
+     * Creates a new component builder
+     * @param position the position the component is located
+     * @return the Component builder instance
+     */
+    public Component component(int position)
+    {
+        Component component = new Component();
+        this.components.put(position, component);
+        return component;
+    }
+
+    /**
+     * Introduces a new ItemStack into the layout
+     * @param position the position in the inventory
+     * @param stack the stack instance
+     * @return the Layout instance
      */
     public Layout introduce(int position, ItemStack stack)
     {
-        Validate.isTrue(position <= (this.size - 1), "The position CANNOT be greater OR equal to the the size of the inventory.");
-        this.stacks.put(position, stack);
+        this.stacks.put(Integer.valueOf(position), stack);
         return this;
     }
 
     /**
-     * Introduces a new item into the layout and adds an action listener to it
-     * @param position the position of the item in the layout
-     * @param stack the item stack to add
-     * @param component the action to be called when the item is clicked
-     * @return the layout instance
+     * Removes a stack at the specified position from the layout
+     * @param position the position in the layout
+     * @return the Layout instance
      */
-    public Layout introduce(int position, ItemStack stack, Component component)
+    public Layout remove(int position)
     {
-        this.components.put(position, component);
-        return this.introduce(position, stack);
-    }
-
-    /**
-     * Removes the item at the specified position from the layout
-     * @param position the position in the inventory
-     * @param component whether or not to remove the action attached to the position
-     * @return the layout instance
-     */
-    public Layout remove(int position, boolean component)
-    {
-        Validate.isTrue(this.stacks.containsKey(position), "The position specified could NOT be found in the layout.");
-        Validate.isTrue(!component ? true : this.components.containsKey(position), "The position specified has no attached actions.");
+        if(!this.stacks.containsKey(position)) throw new IllegalArgumentException("Stack: " + position + " does not exist.");
         this.stacks.remove(position);
-        if(!component) return this;
-        this.components.remove(position);
         return this;
     }
 
     /**
-     * Fills any empty spaces in the layout with the specified ItemStack
-     * @param stack the item stack to add
-     * @return the layout instance
+     * Returns the ItemStack at the specified position
+     * @param position the position the ItemStack is located
+     * @return the ItemStack instance
      */
-    public Layout fill(ItemStack stack)
+    public ItemStack stack(int position)
     {
-        for(int index = 0; index < this.size; index++) if(!this.stacks.containsKey(index)) this.introduce(index, stack); return this;
-    }
-
-    public Layout fill(ItemStack stack, Component component)
-    {
-        for(int index = 0; index < this.size; index++) if(!this.stacks.containsKey(index) && !this.components.containsKey(index)) this.introduce(index, stack, component); return this;
+        return this.stacks.containsKey(position) ? this.stacks.get(position) : new ItemStack(Material.AIR);
     }
 
     /**
-     * Determines if there are any items at the specified position
-     * @param position the position in the inventory
-     * @return true if the position is empty
-     */
-    public boolean empty(int position)
-    {
-        return this.stacks.containsKey(position) ? this.stacks.get(position).getType().equals(Material.AIR) : true;
-    }
-
-    /**
-     * Finds the position of the ItemStack in the layout/inventory
-     * @param stack the item stack instance
-     * @return the position of the ItemStack in the layout/inventory
+     * Returns the position of the stack in the layout
+     * @param stack the stack
+     * @return the position of the stack
      */
     public int position(ItemStack stack)
     {
-        for(Map.Entry<Integer, ItemStack> entry : this.stacks.entrySet()) if(entry.getValue().equals(stack)) return entry.getKey(); return 0;
+        for(Map.Entry<Integer, ItemStack> entry : this.stacks.entrySet()) if(entry.getValue().equals(stack)) return entry.getKey().intValue();
+        return 0;
     }
 
-    public int getSize()
+    public HashMap<Integer, Component> getComponents()
     {
-        return this.size;
+        return this.components;
     }
 
     public HashMap<Integer, ItemStack> getStacks()
@@ -114,8 +102,37 @@ public class Layout
         return this.stacks;
     }
 
-    public HashMap<Integer, Component> getComponents()
+    public class Component
     {
-        return this.components;
+        private final HashMap<ClickType, Action> actions = new HashMap<>();
+
+        /**
+         * Creates an action that is only called when the ClickType matches
+         * @param type the type of click
+         * @param action the action to run when the position is clicked
+         */
+        public void action(ClickType type, Action action)
+        {
+            this.actions.put(type, action);
+        }
+
+        /**
+         * Creates a 'default' action (this will be run despite the ClickType)
+         * @param action the action to run when the position is clicked
+         */
+        public void action(Action action)
+        {
+            this.actions.put(null, action);
+        }
+
+        public HashMap<ClickType, Action> getActions()
+        {
+            return this.actions;
+        }
+    }
+
+    public static interface Action
+    {
+        public void click(InventoryClickEvent event);
     }
 }
