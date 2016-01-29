@@ -1,8 +1,0 @@
-name: Panel
-version: %PLUGIN_VERSION%
-description: Panel library plugin.
-load: STARTUP
-author: CovertLizard
-website: https://github.com/CovertLizard/Panel
-main: com.github.covertlizard.panel.Core
-database: false

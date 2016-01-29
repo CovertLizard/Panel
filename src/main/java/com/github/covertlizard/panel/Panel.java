@@ -3,10 +3,15 @@ package com.github.covertlizard.panel;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.HumanEntity;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.inventory.ClickType;
+import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -32,7 +37,7 @@ public class Panel
     {
         this.inventory = inventory;
         this.introduce(new Layout(), 0);
-        Core.class.cast(Bukkit.getServer().getPluginManager().getPlugin("Panel")).getPanels().put(inventory, this);
+        Registry.PANELS.put(inventory, this);
     }
 
     /**
@@ -208,5 +213,43 @@ public class Panel
     public boolean isGrief()
     {
         return this.grief;
+    }
+
+    public static final class Registry implements org.bukkit.event.Listener
+    {
+        public static final HashMap<Inventory, Panel> PANELS = new HashMap<>();
+
+        /**
+         * Registers the Registry listener
+         * @param plugin the plugin instance
+         */
+        public static void register(JavaPlugin plugin)
+        {
+            plugin.getServer().getPluginManager().registerEvents(new Registry(), plugin);
+        }
+
+        @EventHandler
+        private final void onInventoryClickEvent(InventoryClickEvent event)
+        {
+            if(!Registry.PANELS.containsKey(event.getInventory())) return;
+            Panel panel = Registry.PANELS.get(event.getInventory());
+            if(!panel.isGrief()) event.setCancelled(true);
+            if(!panel.getCurrent().getComponents().containsKey(event.getSlot())) return;
+            for(java.util.Map.Entry<ClickType, Layout.Action> entry : panel.getCurrent().getComponents().get(event.getSlot()).getActions().entrySet())
+            {
+                if(entry.getKey() == null || entry.getKey().equals(event.getClick()))
+                {
+                    entry.getValue().click(event);
+                    break;
+                }
+            }
+        }
+
+        @EventHandler
+        private final void onInventoryDragEvent(InventoryDragEvent event)
+        {
+            if(!Registry.PANELS.containsKey(event.getInventory())) return;
+            if(!Registry.PANELS.get(event.getInventory()).isGrief()) event.setCancelled(true);
+        }
     }
 }
