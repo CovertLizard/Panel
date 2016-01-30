@@ -69,7 +69,7 @@
                 <version>2.8.2</version>
             </plugin>
 
-            <!--Used for compilation of classes. Note: Compiled in Java 8.-->
+            <!--Used for compilation of classes. Note: Compiled in Java 7.-->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
