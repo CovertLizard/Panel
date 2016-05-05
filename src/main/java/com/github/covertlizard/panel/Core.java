@@ -38,8 +38,8 @@ public class Core extends JavaPlugin implements Listener
         if(!this.panels.containsKey(event.getInventory())) return;
         Panel panel = this.panels.get(event.getInventory());
         if(!panel.isGrief()) event.setCancelled(true);
-        if(!panel.getCurrent().getComponents().containsKey(event.getSlot())) return;
-        for(java.util.Map.Entry<ClickType, Layout.Action> entry : panel.getCurrent().getComponents().get(event.getSlot()).getActions().entrySet())
+        if(!panel.getCurrent().getComponents().containsKey(event.getRawSlot())) return;
+        for(java.util.Map.Entry<ClickType, Layout.Action> entry : panel.getCurrent().getComponents().get(event.getRawSlot()).getActions().entrySet())
         {
             if(entry.getKey() == null || entry.getKey().equals(event.getClick()))
             {
