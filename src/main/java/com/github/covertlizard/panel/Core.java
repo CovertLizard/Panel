@@ -5,8 +5,12 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
+import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import com.github.covertlizard.panel.Layout.Action;
+import com.github.covertlizard.panel.Layout.Component;
 
 import java.util.HashMap;
 
@@ -35,11 +39,32 @@ public class Core extends JavaPlugin implements Listener
     @EventHandler
     private final void onInventoryClickEvent(InventoryClickEvent event)
     {
-        if(!this.panels.containsKey(event.getInventory())) return;
+        if(!this.panels.containsKey(event.getInventory()))
+        	return;
+        
         Panel panel = this.panels.get(event.getInventory());
-        if(!panel.isGrief()) event.setCancelled(true);
-        if(!panel.getCurrent().getComponents().containsKey(event.getRawSlot())) return;
-        for(java.util.Map.Entry<ClickType, Layout.Action> entry : panel.getCurrent().getComponents().get(event.getRawSlot()).getActions().entrySet())
+        
+        if(!panel.isGrief())
+        	event.setCancelled(true);
+        
+        Layout current = panel.getCurrent();
+        
+    	processComponent(current.getComponents().get(event.getRawSlot()), event);
+        
+        if (event.getClickedInventory() != null && event.getClickedInventory().getType() == InventoryType.PLAYER)
+        	processComponent(current.getComponents().get(null), event);
+    }
+    
+    /**
+     * Helper function to process all actions associated with a component.
+     * @param component The component whose actions need to be processed.
+     * @param event The event used to process the actions.
+     */
+    private final void processComponent(Component component, InventoryClickEvent event)
+    {
+    	if (component == null) return;
+    	
+    	for(java.util.Map.Entry<ClickType, Layout.Action> entry : component.getActions().entrySet())
         {
             if(entry.getKey() == null || entry.getKey().equals(event.getClick()))
             {

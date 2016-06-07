@@ -46,6 +46,18 @@ public class Layout
         this.components.put(position, component);
         return component;
     }
+    
+    /**
+     * Create a new component builder.
+     * This component will be used for all calls to clicks on the bottom inventory. 
+     * @return The Component builder instance.
+     */
+    public Component component()
+    {
+    	Component component = new Component();
+    	components.put(null, component);
+    	return component;
+    }
 
     /**
      * Introduces a new ItemStack into the layout
@@ -92,11 +104,19 @@ public class Layout
         return 0;
     }
 
+    /**
+     * Returns the components in use by the layout.
+     * @return A reference to the map containing the layout Components.
+     */
     public HashMap<Integer, Component> getComponents()
     {
         return this.components;
     }
 
+    /**
+     * Returns the ItemStacks in use by the layout.
+     * @return A reference to the map containing the layout ItemStacks.
+     */
     public HashMap<Integer, ItemStack> getStacks()
     {
         return this.stacks;
