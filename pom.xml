@@ -6,7 +6,7 @@
 
     <groupId>com.github.covertlizard</groupId>
     <artifactId>panel</artifactId>
-    <version>1.9.1</version>
+    <version>1.10.0</version>
     <name>Panel</name>
 
     <!--Repositories-->
